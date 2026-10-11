@@ -1,0 +1,73 @@
+# 指标口径与诊断规则配置。改口径只改这里，不改代码。
+
+[project]
+title = "Retail KPI Cockpit"
+region = "华东示例大区"
+month = "2026-09"
+days_in_month = 30
+as_of_day = 20
+
+# 派生指标 = numerator / denominator，字段名对应原子指标或引擎计算的中间量
+[[metrics]]
+id = "lead_rate"
+name = "进店→留资率"
+numerator = "leads"
+denominator = "traffic"
+
+[[metrics]]
+id = "td_rate"
+name = "留资→试驾率"
+numerator = "test_drives"
+denominator = "leads"
+
+[[metrics]]
+id = "lock_rate"
+name = "试驾→锁单率"
+numerator = "locks"
+denominator = "test_drives"
+
+[[metrics]]
+id = "achievement"
+name = "时间进度达成率"
+numerator = "locks"
+denominator = "target_to_date"
+
+# 健康分：同层级门店内对各转化率做 Z-score，按权重加总后映射到 0–100
+[health]
+tier_by = "locks"
+tiers = ["一级", "二级", "三级"]
+center = 50
+scale = 15
+
+[health.weights]
+lead_rate = 0.25
+td_rate = 0.30
+lock_rate = 0.45
+
+[alerts]
+z_threshold = -1.0
+p1_achievement = 0.60
+p2_achievement = 0.85
+min_test_drives = 8
+# 月目标过小的单元达成率波动大，只做数据质量校验，不参与达成预警
+min_month_target = 6
+
+# 病因 -> 判定指标（Z-score 低于阈值即命中）
+[alerts.causes]
+"渠道类" = "lead_rate"
+"跟进类" = "td_rate"
+"效率类" = "lock_rate"
+
+[alerts.owners]
+"渠道类" = "大区运营 / 品牌活动组"
+"跟进类" = "销售主管 / 培训组"
+"效率类" = "销售经理 / 陪驾组"
+"综合类" = "门店店长"
+"数据类" = "BI 数据链路"
+
+[alerts.actions]
+"渠道类" = "复盘本月投放渠道与线索来源，砍掉低意向渠道"
+"跟进类" = "排查 48 小时内首次邀约率，补齐试驾邀约话术"
+"效率类" = "抽检试驾陪同与报价环节，安排标杆门店带教"
+"综合类" = "店长牵头做一次全漏斗复盘，按周跟进改善"
+"数据类" = "核对当日数据导入记录，修正后重算"
