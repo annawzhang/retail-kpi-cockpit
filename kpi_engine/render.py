@@ -213,7 +213,7 @@ def render(ctx: dict) -> str:
   <h2>指标口径</h2>
   <div class="card">{metric_table(cfg['metrics'])}</div>
 
-  <footer>由 kpi_engine 自动生成 · 指标口径与诊断规则见 config/metrics.toml</footer>
+  <footer>由 kpi_engine 自动生成 · 指标口径与诊断规则见 config/metrics.toml · © 2026 张文婧 (Anna Zhang) · github.com/annawzhang · MIT · 保留署名</footer>
 </div>
 </body>
 </html>
